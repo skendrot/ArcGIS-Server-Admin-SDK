@@ -41,9 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Admin.cs" />
-    <Compile Include="AdminResult.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="CreateServiceParameters.cs" />
     <Compile Include="IsolationLevel.cs" />
     <Compile Include="LoadBalancing.cs" />
     <Compile Include="LogLevel.cs" />
