@@ -63,7 +63,6 @@
     <Compile Include="UploadParameters.cs" />
     <Compile Include="UploadResult.cs" />
     <Compile Include="UpperCaseConverter.cs" />
-    <Compile Include="WebRequestExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
