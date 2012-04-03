@@ -28,6 +28,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+
 using Newtonsoft.Json;
 
 namespace VisuallyLocated.ArcGIS.Server
@@ -62,56 +63,72 @@ namespace VisuallyLocated.ArcGIS.Server
 
         public Task<IEnumerable<Machine>> GetMachinesAsync(UserToken token)
         {
-            var currentThread = TaskScheduler.FromCurrentSynchronizationContext();
             var parameters = GetBaseParameters(token);
 
-            return RequestResultAsync(parameters, Constants.TokenUrl)
-                .ContinueWith(t => JsonConvert.DeserializeObject<IEnumerable<Machine>>(t.Result),
-                              currentThread);
+            //return RequestResultAsync(parameters, Constants.TokenUrl)
+            //    .ContinueWith(t => JsonConvert.DeserializeObject<IEnumerable<Machine>>(t.Result),
+            //                  currentThread);
+
+            var taskCompletionSource = new TaskCompletionSource<IEnumerable<Machine>>();
+            RequestResult(parameters, Constants.MachinesUrl,
+                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<IEnumerable<Machine>>(result)));
+            return taskCompletionSource.Task;
         }
 
         public Task<Service> GetServiceAsync(UserToken token, string serviceName, ServiceType serviceType, string folder = null)
         {
-            var currentThread = TaskScheduler.FromCurrentSynchronizationContext();
             var parameters = GetBaseParameters(token);
 
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), serviceName, serviceType);
-            return RequestResultAsync(parameters, url)
-                .ContinueWith(t =>
-                {
-                    var service = JsonConvert.DeserializeObject
-                            <Service>(t.Result);
-                    return service;
-                }, currentThread);
+            //return RequestResultAsync(parameters, url)
+            //    .ContinueWith(t =>
+            //    {
+            //        var service = JsonConvert.DeserializeObject
+            //                <Service>(t.Result);
+            //        return service;
+            //    }, currentThread);
+
+            var taskCompletionSource = new TaskCompletionSource<Service>();
+            RequestResult(parameters, url,
+                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<Service>(result)));
+            return taskCompletionSource.Task;
         }
 
         public Task<ServicesContainer> GetServicesAsync(UserToken token, bool getFulldetails, string folder = null)
         {
-            var currentThread = TaskScheduler.FromCurrentSynchronizationContext();
             var parameters = GetBaseParameters(token);
             parameters.Add(Constants.Detail, getFulldetails.ToString(CultureInfo.InvariantCulture));
 
-            return RequestResultAsync(parameters, GetFolderUrl(Constants.ServicesUrl, folder))
-                .ContinueWith(t =>
-                                  {
-                                      var services = JsonConvert.DeserializeObject<ServicesContainer>(t.Result);
-                                      return services;
-                                  }, currentThread);
+            //return RequestResultAsync(parameters, GetFolderUrl(Constants.ServicesUrl, folder))
+            //    .ContinueWith(t =>
+            //                      {
+            //                          var services = JsonConvert.DeserializeObject<ServicesContainer>(t.Result);
+            //                          return services;
+            //                      }, currentThread);
+
+            var taskCompletionSource = new TaskCompletionSource<ServicesContainer>();
+            RequestResult(parameters, GetFolderUrl(Constants.ServicesUrl, folder),
+                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<ServicesContainer>(result)));
+            return taskCompletionSource.Task;
         }
 
         public Task<RequestStatus> CreateFolderAsync(UserToken token, string folderName)
         {
-            var currentThread = TaskScheduler.FromCurrentSynchronizationContext();
             var parameters = GetBaseParameters(token);
             parameters.Add(Constants.FolderName, folderName);
             parameters.Add(Constants.Description, "None");
 
-            return RequestResultAsync(parameters, Constants.CreateFolderUrl, true)
-                .ContinueWith(t =>
-                {
-                    var status = JsonConvert.DeserializeObject<RequestStatus>(t.Result);
-                    return status;
-                }, currentThread);
+            //return RequestResultAsync(parameters, Constants.CreateFolderUrl, true)
+            //    .ContinueWith(t =>
+            //    {
+            //        var status = JsonConvert.DeserializeObject<RequestStatus>(t.Result);
+            //        return status;
+            //    }, currentThread);
+            var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
+            RequestResult(parameters, Constants.CreateFolderUrl,
+                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<RequestStatus>(result)),
+                true);
+            return taskCompletionSource.Task;
         }
 
         public Task<RequestStatus> EditServiceAsync(UserToken token, Service service, string folder = null)
@@ -141,8 +158,14 @@ namespace VisuallyLocated.ArcGIS.Server
             var parameters = GetBaseParameters(token);
             parameters[Constants.ID] = id;
 
-            return RequestResultAsync(parameters, Constants.RegisterUrl, true)
-                          .ContinueWith(t => RequestStatus.Success, currentThread);
+            //return RequestResultAsync(parameters, Constants.RegisterUrl, true)
+            //              .ContinueWith(t => RequestStatus.Success, currentThread);
+
+            var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
+            RequestResult(parameters, Constants.RegisterUrl,
+                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<RequestStatus>(result)),
+                true);
+            return taskCompletionSource.Task;
         }
 
         public Task<RequestStatus> StopServicesAsync(UserToken token, string folder = null)
@@ -192,11 +215,15 @@ namespace VisuallyLocated.ArcGIS.Server
         private Task<RequestStatus> StartOrStopServiceAsync(string serviceName, ServiceType serviceType, UserToken token, string action, string folder)
         {
             var parameters = GetBaseParameters(token);
-            var currentThread = TaskScheduler.FromCurrentSynchronizationContext();
 
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), serviceName, serviceType);
-            return RequestResultAsync(parameters, string.Format("{0}/{1}/", url, action))
-                .ContinueWith(t => RequestStatus.Success, currentThread);
+            //return RequestResultAsync(parameters, string.Format("{0}/{1}/", url, action))
+            //    .ContinueWith(t => RequestStatus.Success, currentThread);
+
+            var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
+            RequestResult(parameters, string.Format("{0}/{1}/", url, action),
+                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<RequestStatus>(result)));
+            return taskCompletionSource.Task;
         }
 
         private void RequestResult(IDictionary<string, string> parameters, string adminEndpoint, Action<string> callback, bool post = false, string postData = null)
@@ -230,26 +257,6 @@ namespace VisuallyLocated.ArcGIS.Server
                         }
                     }, null);
             }, null);
-        }
-
-        private Task<string> RequestResultAsync(IDictionary<string, string> parameters, string adminEndpoint, bool post = false, string postData = null)
-        {
-            var currentThread = TaskScheduler.FromCurrentSynchronizationContext();
-            var uri = new Uri(string.Format("{0}{1}?{2}", _serverUrl, adminEndpoint, GetQueryString(parameters)), UriKind.Absolute);
-
-            WebRequest webRequest = WebRequest.Create(uri);
-            webRequest.ContentType = "application/x-www-form-urlencoded";
-            webRequest.Method = post ? "POST" : "GET";
-            //webRequest.Accept = "text/plain";
-
-            return webRequest.GetReponseAsync()
-                .ContinueWith(t =>
-                                  {
-                                      using (var reader = new StreamReader(t.Result.GetResponseStream()))
-                                      {
-                                          return reader.ReadToEnd();
-                                      }
-                                  }, currentThread);
         }
 
         private static IDictionary<string, string> GetBaseParameters(UserToken token = null)
