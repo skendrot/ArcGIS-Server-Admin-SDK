@@ -371,28 +371,38 @@ namespace VisuallyLocated.ArcGIS.Server
             webRequest.Method = post ? "POST" : "GET";
             //webRequest.Accept = "text/plain";
 
-            webRequest.BeginGetRequestStream(ar =>
-            {
-                if (postData != null)
-                {
-                    var encoding = new UTF8Encoding();
-                    var bytes = encoding.GetBytes(postData);
-                    using (Stream os = webRequest.EndGetRequestStream(ar))
-                    {
-                        os.Write(bytes, 0, bytes.Length);
-                    }
-                }
-                webRequest.BeginGetResponse(
-                    ar2 =>
-                    {
-                        using (var response = webRequest.EndGetResponse(ar2))
-                        using (var reader = new StreamReader(response.GetResponseStream()))
-                        {
-                            string result = reader.ReadToEnd();
-                            if (callback != null) callback(result);
-                        }
-                    }, null);
-            }, null);
+            Action<IAsyncResult> getResponse = asyncResult =>
+                                   {
+                                       using (var response = webRequest.EndGetResponse(asyncResult))
+                                       using (var reader = new StreamReader(response.GetResponseStream()))
+                                       {
+                                           string result = reader.ReadToEnd();
+                                           if (callback != null) callback(result);
+                                       }
+                                   };
+
+            Action<IAsyncResult> postResponse = asyncResult =>
+                                                    {
+                                                        if (postData != null)
+                                                        {
+                                                            var encoding = new UTF8Encoding();
+                                                            var bytes = encoding.GetBytes(postData);
+                                                            using (Stream os = webRequest.EndGetRequestStream(asyncResult))
+                                                            {
+                                                                os.Write(bytes, 0, bytes.Length);
+                                                            }
+                                                        }
+                                                        webRequest.BeginGetResponse(ar2 => getResponse(ar2), null);
+                                                    };
+
+            //if (post)
+            //{
+                webRequest.BeginGetRequestStream(ar => postResponse(ar), null);
+            //}
+            //else
+            //{
+            //    webRequest.BeginGetResponse(ar => getResponse(ar), null);
+            //}
         }
 
         private static IDictionary<string, string> GetBaseParameters(UserToken token = null)
