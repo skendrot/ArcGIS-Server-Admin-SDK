@@ -395,14 +395,14 @@ namespace VisuallyLocated.ArcGIS.Server
                                                         webRequest.BeginGetResponse(ar2 => getResponse(ar2), null);
                                                     };
 
-            //if (post)
-            //{
+            if (post)
+            {
                 webRequest.BeginGetRequestStream(ar => postResponse(ar), null);
-            //}
-            //else
-            //{
-            //    webRequest.BeginGetResponse(ar => getResponse(ar), null);
-            //}
+            }
+            else
+            {
+                webRequest.BeginGetResponse(ar => getResponse(ar), null);
+            }
         }
 
         private static IDictionary<string, string> GetBaseParameters(UserToken token = null)
