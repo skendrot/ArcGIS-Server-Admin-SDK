@@ -31,7 +31,8 @@ namespace VisuallyLocated.ArcGIS.Server
         public const string QueryUrl = AdminUrl + "logs/query";
         public const string CreateFolderUrl = AdminUrl + "services/createFolder/";
         public const string MachinesUrl = AdminUrl + "machines";
-        public const string UploadUrl = AdminUrl + "uploads/upload";
+        public const string UploadsUrl = AdminUrl + "uploads/";
+        public const string UploadItemUrl = UploadsUrl + "upload";
         public const string RegisterUrl = AdminUrl + "services/types/extensions/register";
         public const string EditUrl = "/edit";
 
@@ -52,5 +53,6 @@ namespace VisuallyLocated.ArcGIS.Server
         public const string Stop = "stop";
         public const string ID = "id";
         public const string RequestIP = "requestip";
+
     }
 }

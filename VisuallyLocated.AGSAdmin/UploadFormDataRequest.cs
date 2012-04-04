@@ -44,7 +44,7 @@ namespace VisuallyLocated.ArcGIS.Server
 
         public void UploadAsync(string serverUrl, Action<string> callback)
         {
-            var uri = new Uri(string.Format("{0}{1}?token={2}", serverUrl, Constants.UploadUrl, _token.Token), UriKind.Absolute);
+            var uri = new Uri(string.Format("{0}{1}?token={2}", serverUrl, Constants.UploadItemUrl, _token.Token), UriKind.Absolute);
 
             _webRequest = Create(uri);
             ((HttpWebRequest)_webRequest).AllowWriteStreamBuffering = true;

@@ -37,6 +37,16 @@ namespace VisuallyLocated.ArcGIS.Server
     {
         private readonly string _serverUrl;
 
+        /// <summary>
+        /// Initializes a new Admin. 
+        /// </summary>
+        /// <param name="serverUrl">The url to the server to administer. 
+        /// This value should include the full url to get to the ArcGIS Server, included http and port number.</param>
+        /// <example>
+        /// <code>
+        /// Admin admin = new Admin("http://localhost:6080");
+        /// </code>
+        /// </example>
         public Admin(string serverUrl)
         {
             if (string.IsNullOrEmpty(serverUrl)) throw new ArgumentNullException("serverUrl");
@@ -44,6 +54,12 @@ namespace VisuallyLocated.ArcGIS.Server
             _serverUrl = serverUrl;
         }
 
+        /// <summary>
+        /// Generates a new <see cref="UserToken"/>
+        /// </summary>
+        /// <param name="user">The ArcGIS Server Manager user name to use.</param>
+        /// <param name="password">The passord for the given user name.</param>
+        /// <returns>The <see cref="UserToken"/> for the given name and password.</returns>
         public Task<UserToken> GenerateTokenAsync(string user, string password)
         {
             var parameters = GetBaseParameters();
@@ -51,9 +67,6 @@ namespace VisuallyLocated.ArcGIS.Server
             parameters.Add(Constants.Password, password);
             parameters.Add(Constants.Client, Constants.RequestIP);
 
-            //return RequestResultAsync(parameters, Constants.TokenUrl, true)
-            //    .ContinueWith(t => JsonConvert.DeserializeObject<UserToken>(t.Result),
-            //    currentThread);
             var taskCompletionSource = new TaskCompletionSource<UserToken>();
             RequestResult(parameters, Constants.TokenUrl,
                 result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<UserToken>(result)),
@@ -61,13 +74,14 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
+        /// <summary>
+        /// Retrieves the machines associated with the ArcGIS Server.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <returns></returns>
         public Task<IEnumerable<Machine>> GetMachinesAsync(UserToken token)
         {
             var parameters = GetBaseParameters(token);
-
-            //return RequestResultAsync(parameters, Constants.TokenUrl)
-            //    .ContinueWith(t => JsonConvert.DeserializeObject<IEnumerable<Machine>>(t.Result),
-            //                  currentThread);
 
             var taskCompletionSource = new TaskCompletionSource<IEnumerable<Machine>>();
             RequestResult(parameters, Constants.MachinesUrl,
@@ -75,18 +89,20 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
+        /// <summary>
+        /// Retrieves the service from the ArcGIS Server under the folder with the given name.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="serviceName">The name of the service to get.</param>
+        /// <param name="serviceType">The <see cref="ServiceType"/> of the service.</param>
+        /// <param name="folder">The folder the service in under. If no folder is given,
+        /// will attempt to get the service under the root folder.</param>
+        /// <returns></returns>
         public Task<Service> GetServiceAsync(UserToken token, string serviceName, ServiceType serviceType, string folder = null)
         {
             var parameters = GetBaseParameters(token);
 
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), serviceName, serviceType);
-            //return RequestResultAsync(parameters, url)
-            //    .ContinueWith(t =>
-            //    {
-            //        var service = JsonConvert.DeserializeObject
-            //                <Service>(t.Result);
-            //        return service;
-            //    }, currentThread);
 
             var taskCompletionSource = new TaskCompletionSource<Service>();
             RequestResult(parameters, url,
@@ -94,17 +110,19 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
+        /// <summary>
+        /// Retrieves al of the services under the given folder. If no folder is given, 
+        /// will retrieve services from the root folder.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="getFulldetails">A value indicating whether all details for the services should be returned.</param>
+        /// <param name="folder">The folder under which to get services. If no folder is given,
+        /// will get services under the root folder.</param>
+        /// <returns></returns>
         public Task<ServicesContainer> GetServicesAsync(UserToken token, bool getFulldetails, string folder = null)
         {
             var parameters = GetBaseParameters(token);
             parameters.Add(Constants.Detail, getFulldetails.ToString(CultureInfo.InvariantCulture));
-
-            //return RequestResultAsync(parameters, GetFolderUrl(Constants.ServicesUrl, folder))
-            //    .ContinueWith(t =>
-            //                      {
-            //                          var services = JsonConvert.DeserializeObject<ServicesContainer>(t.Result);
-            //                          return services;
-            //                      }, currentThread);
 
             var taskCompletionSource = new TaskCompletionSource<ServicesContainer>();
             RequestResult(parameters, GetFolderUrl(Constants.ServicesUrl, folder),
@@ -112,18 +130,18 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
+        /// <summary>
+        /// Creates a new folder under the root directory in the server.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="folderName">The name of the folder to create.</param>
+        /// <returns></returns>
         public Task<RequestStatus> CreateFolderAsync(UserToken token, string folderName)
         {
             var parameters = GetBaseParameters(token);
             parameters.Add(Constants.FolderName, folderName);
             parameters.Add(Constants.Description, "None");
 
-            //return RequestResultAsync(parameters, Constants.CreateFolderUrl, true)
-            //    .ContinueWith(t =>
-            //    {
-            //        var status = JsonConvert.DeserializeObject<RequestStatus>(t.Result);
-            //        return status;
-            //    }, currentThread);
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
             RequestResult(parameters, Constants.CreateFolderUrl,
                 result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<RequestStatus>(result)),
@@ -131,6 +149,14 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
+        /// <summary>
+        /// Posts the service to the server.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="service">The service to post.</param>
+        /// <param name="folder">The folder the service is contained within. 
+        /// If no folder is given, will attempt to post the service to the root folder.</param>
+        /// <returns></returns>
         public Task<RequestStatus> EditServiceAsync(UserToken token, Service service, string folder = null)
         {
             var parameters = GetBaseParameters(token);
@@ -143,6 +169,27 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
+        /// <summary>
+        /// Get all of the items uploaded to the server.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <returns></returns>
+        public Task<IEnumerable<UploadedItem>> GetUploadedItems(UserToken token)
+        {
+            var parameters = GetBaseParameters(token);
+            var taskCompletionSource = new TaskCompletionSource<IEnumerable<UploadedItem>>();
+
+            RequestResult(parameters, Constants.UploadsUrl,
+                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<IEnumerable<UploadedItem>>(result)));
+            return taskCompletionSource.Task;          
+        }
+
+        /// <summary>
+        /// Upload an item to the server.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="parameters">The parameters of the item to upload.</param>
+        /// <returns></returns>
         public Task<UploadResult> UploadItemAsync(UserToken token, UploadParameters parameters)
         {
             var taskCompletionSource = new TaskCompletionSource<UploadResult>();
@@ -152,14 +199,17 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
-        public Task<RequestStatus> RegisterItemAsync(UserToken token, string id)
+        /// <summary>
+        /// Registers a new server object extension file with the Server. Before your register the file, 
+        /// you need to upload the .SOE file to the server using <see cref="M:UploadItemAsync"/>.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="id">The id of the extension to register.</param>
+        /// <returns></returns>
+        public Task<RequestStatus> RegisterExtensionAsync(UserToken token, string id)
         {
-            var currentThread = TaskScheduler.FromCurrentSynchronizationContext();
             var parameters = GetBaseParameters(token);
             parameters[Constants.ID] = id;
-
-            //return RequestResultAsync(parameters, Constants.RegisterUrl, true)
-            //              .ContinueWith(t => RequestStatus.Success, currentThread);
 
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
             RequestResult(parameters, Constants.RegisterUrl,
@@ -168,21 +218,53 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
+        /// <summary>
+        /// Stops all services in the given folder. If no folder if given, will stop all services under the root folder.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="folder">The folder under which all services should be stopped. If not folder is given,
+        /// will stop all services under the root folder.</param>
+        /// <returns></returns>
         public Task<RequestStatus> StopServicesAsync(UserToken token, string folder = null)
         {
             return StartOrStopServicesAsync(token, Constants.Stop, folder);
         }
 
+        /// <summary>
+        /// Starts all services in the given folder. If no folder if given, will start all services under the root folder.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="folder">The folder under which all services should be started. If not folder is given,
+        /// will start all services under the root folder.</param>
+        /// <returns></returns>
         public Task<RequestStatus> StartServicesAsync(UserToken token, string folder = null)
         {
             return StartOrStopServicesAsync(token, Constants.Start, folder);
         }
 
+        /// <summary>
+        /// Start the given service on all registered machines.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="serviceName">The name of the service to start.</param>
+        /// <param name="serviceType">The type of the service to start.</param>
+        /// <param name="folder">The folder the service is under. If no folder is given, 
+        /// will attempt to stop the service under the root folder.</param>
+        /// <returns></returns>
         public Task<RequestStatus> StartServiceAsync(UserToken token, string serviceName, ServiceType serviceType, string folder = null)
         {
             return StartOrStopServiceAsync(serviceName, serviceType, token, Constants.Start, folder);
         }
 
+        /// <summary>
+        /// Stop the services on all registered machines.
+        /// </summary>
+        /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
+        /// <param name="serviceName">The name of the service to stop.</param>
+        /// <param name="serviceType">The type of the service to stop.</param>
+        /// <param name="folder">The folder the service is under. If no folder is given, 
+        /// will attempt to start the service under the root folder.</param>
+        /// <returns></returns>
         public Task<RequestStatus> StopServiceAsync(UserToken token, string serviceName, ServiceType serviceType, string folder = null)
         {
             return StartOrStopServiceAsync(serviceName, serviceType, token, Constants.Stop, folder);
@@ -217,8 +299,6 @@ namespace VisuallyLocated.ArcGIS.Server
             var parameters = GetBaseParameters(token);
 
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), serviceName, serviceType);
-            //return RequestResultAsync(parameters, string.Format("{0}/{1}/", url, action))
-            //    .ContinueWith(t => RequestStatus.Success, currentThread);
 
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
             RequestResult(parameters, string.Format("{0}/{1}/", url, action),
@@ -284,7 +364,6 @@ namespace VisuallyLocated.ArcGIS.Server
         private static string GetQueryString(IDictionary<string, string> parameters)
         {
             return string.Join("&", parameters.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
-            //return string.Join("&", parameters.Select(kvp => string.Format("{0}={1}", kvp.Key, HttpUtility.UrlEncode(kvp.Value))).ToArray());
         }
     }
 }

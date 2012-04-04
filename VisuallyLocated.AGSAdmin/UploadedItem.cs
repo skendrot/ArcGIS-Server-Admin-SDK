@@ -20,14 +20,22 @@
     For more information see http://www.microsoft.com/en-us/openness/licenses.aspx
 */
 
+using Newtonsoft.Json;
+
 namespace VisuallyLocated.ArcGIS.Server
 {
     public class UploadedItem
     {
-        public string ItemID { get; set; }
-        public string ItemName { get; set; }
+        [JsonProperty("itemID")]
+        public string ID { get; set; }
+
+        [JsonProperty("itemName")]
+        public string Name { get; set; }
+
         public string Description { get; set; }
+        
         public string PathOnServer { get; set; }
+        
         public bool Committed { get; set; }
     }
 }
