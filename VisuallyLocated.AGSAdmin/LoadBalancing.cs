@@ -20,14 +20,19 @@
     For more information see http://www.microsoft.com/en-us/openness/licenses.aspx
 */
 
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace VisuallyLocated.ArcGIS.Server
 {
-    [JsonConverter(typeof(UpperCaseStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum LoadBalancing
     {
-        Round_Robin,
-        Fail_Over
+        [EnumMember(Value = "ROUND_ROBIN")]
+        RoundRobin,
+
+        [EnumMember(Value = "FAIL_OVER")]
+        FailOver
     }
 }

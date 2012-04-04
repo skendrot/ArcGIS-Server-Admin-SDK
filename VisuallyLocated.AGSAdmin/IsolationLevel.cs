@@ -20,15 +20,22 @@
     For more information see http://www.microsoft.com/en-us/openness/licenses.aspx
 */
 
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace VisuallyLocated.ArcGIS.Server
 {
-    [JsonConverter(typeof(UpperCaseStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum IsolationLevel
     {
+        [EnumMember(Value = "LOW")]
         Low,
+
+        [EnumMember(Value = "MEDIUM")]
         Medium,
+
+        [EnumMember(Value = "HIGH")]
         High
     }
 }
