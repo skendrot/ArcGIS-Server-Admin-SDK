@@ -42,6 +42,7 @@ namespace VisuallyLocated.ArcGIS.Server
         /// </summary>
         /// <param name="serverUrl">The url to the server to administer. 
         /// This value should include the full url to get to the ArcGIS Server, included http and port number.</param>
+        /// <exception cref="ArgumentNullException">The url cannot be null.</exception>
         /// <example>
         /// <code>
         /// Admin admin = new Admin("http://localhost:6080");
@@ -60,8 +61,13 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="user">The ArcGIS Server Manager user name to use.</param>
         /// <param name="password">The passord for the given user name.</param>
         /// <returns>The <see cref="UserToken"/> for the given name and password.</returns>
+        /// <exception cref="ArgumentNullException">User name cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">Password cannot be null.</exception>
         public Task<UserToken> GenerateTokenAsync(string user, string password)
         {
+            if (user == null) throw new ArgumentNullException("user");
+            if (password == null) throw new ArgumentNullException("password");
+
             var parameters = GetBaseParameters();
             parameters.Add(Constants.UserName, user);
             parameters.Add(Constants.Password, password);
@@ -79,8 +85,11 @@ namespace VisuallyLocated.ArcGIS.Server
         /// </summary>
         /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
         public Task<IEnumerable<Machine>> GetMachinesAsync(UserToken token)
         {
+            if (token == null) throw new ArgumentNullException("token");
+
             var parameters = GetBaseParameters(token);
 
             var taskCompletionSource = new TaskCompletionSource<IEnumerable<Machine>>();
@@ -98,8 +107,13 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="folder">The folder the service in under. If no folder is given,
         /// will attempt to get the service under the root folder.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">serviceName cannot be null.</exception>
         public Task<Service> GetServiceAsync(UserToken token, string serviceName, ServiceType serviceType, string folder = null)
         {
+            if (token == null) throw new ArgumentNullException("token");
+            if (string.IsNullOrEmpty(serviceName)) throw new ArgumentNullException("serviceName");
+
             var parameters = GetBaseParameters(token);
 
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), serviceName, serviceType);
@@ -119,8 +133,11 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="folder">The folder under which to get services. If no folder is given,
         /// will get services under the root folder.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
         public Task<ServicesContainer> GetServicesAsync(UserToken token, bool getFulldetails, string folder = null)
         {
+            if (token == null) throw new ArgumentNullException("token");
+
             var parameters = GetBaseParameters(token);
             parameters.Add(Constants.Detail, getFulldetails.ToString(CultureInfo.InvariantCulture));
 
@@ -136,8 +153,13 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
         /// <param name="folderName">The name of the folder to create.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">folderName cannot be null.</exception>
         public Task<RequestStatus> CreateFolderAsync(UserToken token, string folderName)
         {
+            if (token == null) throw new ArgumentNullException("token");
+            if (string.IsNullOrEmpty(folderName)) throw new ArgumentNullException("folderName");
+
             var parameters = GetBaseParameters(token);
             parameters.Add(Constants.FolderName, folderName);
             parameters.Add(Constants.Description, "None");
@@ -157,8 +179,13 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="folder">The folder the service is contained within. 
         /// If no folder is given, will attempt to post the service to the root folder.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">service cannot be null.</exception>
         public Task<RequestStatus> EditServiceAsync(UserToken token, Service service, string folder = null)
         {
+            if (token == null) throw new ArgumentNullException("token");
+            if (service == null) throw new ArgumentNullException("service");
+
             var parameters = GetBaseParameters(token);
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
 
@@ -174,8 +201,11 @@ namespace VisuallyLocated.ArcGIS.Server
         /// </summary>
         /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
         public Task<IEnumerable<UploadedItem>> GetUploadedItems(UserToken token)
         {
+            if (token == null) throw new ArgumentNullException("token");
+
             var parameters = GetBaseParameters(token);
             var taskCompletionSource = new TaskCompletionSource<IEnumerable<UploadedItem>>();
 
@@ -190,8 +220,13 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
         /// <param name="parameters">The parameters of the item to upload.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">parameters cannot be null.</exception>
         public Task<UploadResult> UploadItemAsync(UserToken token, UploadParameters parameters)
         {
+            if (token == null) throw new ArgumentNullException("token");
+            if (parameters == null) throw new ArgumentNullException("parameters");
+
             var taskCompletionSource = new TaskCompletionSource<UploadResult>();
             var uploader = new UploadFormDataRequest(token, parameters);
             uploader.UploadAsync(_serverUrl,
@@ -206,8 +241,13 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
         /// <param name="id">The id of the extension to register.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">id cannot be null.</exception>
         public Task<RequestStatus> RegisterExtensionAsync(UserToken token, string id)
         {
+            if (token == null) throw new ArgumentNullException("token");
+            if (string.IsNullOrEmpty(id)) throw new ArgumentNullException("id");
+
             var parameters = GetBaseParameters(token);
             parameters[Constants.ID] = id;
 
@@ -225,8 +265,11 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="folder">The folder under which all services should be stopped. If not folder is given,
         /// will stop all services under the root folder.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
         public Task<RequestStatus> StopServicesAsync(UserToken token, string folder = null)
         {
+            if (token == null) throw new ArgumentNullException("token");
+
             return StartOrStopServicesAsync(token, Constants.Stop, folder);
         }
 
@@ -237,8 +280,11 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="folder">The folder under which all services should be started. If not folder is given,
         /// will start all services under the root folder.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
         public Task<RequestStatus> StartServicesAsync(UserToken token, string folder = null)
         {
+            if (token == null) throw new ArgumentNullException("token");
+
             return StartOrStopServicesAsync(token, Constants.Start, folder);
         }
 
@@ -251,8 +297,13 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="folder">The folder the service is under. If no folder is given, 
         /// will attempt to stop the service under the root folder.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">serviceName cannot be null.</exception>
         public Task<RequestStatus> StartServiceAsync(UserToken token, string serviceName, ServiceType serviceType, string folder = null)
         {
+            if (token == null) throw new ArgumentNullException("token");
+            if (string.IsNullOrEmpty(serviceName)) throw new ArgumentNullException("serviceName");
+
             return StartOrStopServiceAsync(serviceName, serviceType, token, Constants.Start, folder);
         }
 
@@ -265,8 +316,13 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="folder">The folder the service is under. If no folder is given, 
         /// will attempt to start the service under the root folder.</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentNullException">token cannot be null.</exception>
+        /// <exception cref="ArgumentNullException">serviceName cannot be null.</exception>
         public Task<RequestStatus> StopServiceAsync(UserToken token, string serviceName, ServiceType serviceType, string folder = null)
         {
+            if (token == null) throw new ArgumentNullException("token");
+            if (string.IsNullOrEmpty(serviceName)) throw new ArgumentNullException("serviceName");
+
             return StartOrStopServiceAsync(serviceName, serviceType, token, Constants.Stop, folder);
         }
 
