@@ -33,22 +33,25 @@ using Newtonsoft.Json;
 
 namespace VisuallyLocated.ArcGIS.Server
 {
-    public class Admin
+    /// <summary>
+    /// Represents a connection to the ArcGIS Server Admin REST API.
+    /// </summary>
+    public class AdminService
     {
         private readonly string _serverUrl;
 
         /// <summary>
-        /// Initializes a new Admin. 
+        /// Initializes a new instance of AdminService. 
         /// </summary>
         /// <param name="serverUrl">The url to the server to administer. 
         /// This value should include the full url to get to the ArcGIS Server, included http and port number.</param>
         /// <exception cref="ArgumentNullException">The url cannot be null.</exception>
         /// <example>
         /// <code>
-        /// Admin admin = new Admin("http://localhost:6080");
+        /// AdminService service = new AdminService("http://localhost:6080");
         /// </code>
         /// </example>
-        public Admin(string serverUrl)
+        public AdminService(string serverUrl)
         {
             if (string.IsNullOrEmpty(serverUrl)) throw new ArgumentNullException("serverUrl");
 
