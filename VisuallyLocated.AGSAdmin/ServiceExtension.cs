@@ -29,7 +29,7 @@ namespace VisuallyLocated.ArcGIS.Server
     public class ServiceExtension
     {
         [JsonProperty("typeName")]
-        public string TypeName { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("capabilities")]
         public string Capabilities { get; set; }

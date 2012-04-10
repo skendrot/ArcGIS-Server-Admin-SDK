@@ -253,7 +253,7 @@ namespace VisuallyLocated.ArcGIS.Server
 
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
             RequestResult(parameters, Constants.RegisterUrl,
-                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<RequestStatus>(result)),
+                result => taskCompletionSource.SetResult(RequestStatus.Success),
                 true);
             return taskCompletionSource.Task;
         }

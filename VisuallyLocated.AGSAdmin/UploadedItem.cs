@@ -24,18 +24,36 @@ using Newtonsoft.Json;
 
 namespace VisuallyLocated.ArcGIS.Server
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class UploadedItem
     {
+        /// <summary>
+        /// Gets the ID of the uploaded item.
+        /// </summary>
         [JsonProperty("itemID")]
-        public string ID { get; set; }
+        public string ID { get; internal set; }
 
+        /// <summary>
+        /// Gets the name of the uploaded item.
+        /// </summary>
         [JsonProperty("itemName")]
-        public string Name { get; set; }
+        public string Name { get; internal set; }
 
-        public string Description { get; set; }
-        
-        public string PathOnServer { get; set; }
-        
-        public bool Committed { get; set; }
+        /// <summary>
+        /// Gets the description of the uploaded item.
+        /// </summary>
+        public string Description { get; internal set; }
+
+        /// <summary>
+        /// Gets the location
+        /// </summary>
+        public string PathOnServer { get; internal set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the item was committed to the server.
+        /// </summary>
+        public bool Committed { get; internal set; }
     }
 }
