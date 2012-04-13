@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2E61CDF6-B1D7-4C45-9530-AE09919FE500}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>VisuallyLocated.AgsAdmin35</RootNamespace>
+    <AssemblyName>VisuallyLocated.AgsAdmin35</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.1\lib\net35\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Threading.Tasks.NET35">
+      <HintPath>..\packages\System.Threading.Tasks.3.0\lib\net35\System.Threading.Tasks.NET35.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\AdminResult.cs">
+      <Link>AdminResult.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\AdminService.cs">
+      <Link>AdminService.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\Constants.cs">
+      <Link>Constants.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\CreateServiceParameters.cs">
+      <Link>CreateServiceParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\EditServiceParameters.cs">
+      <Link>EditServiceParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\IsolationLevel.cs">
+      <Link>IsolationLevel.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\LoadBalancing.cs">
+      <Link>LoadBalancing.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\LogLevel.cs">
+      <Link>LogLevel.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\Machine.cs">
+      <Link>Machine.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\RequestStatus.cs">
+      <Link>RequestStatus.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\Service.cs">
+      <Link>Service.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\ServiceExtension.cs">
+      <Link>ServiceExtension.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\ServicesContainer.cs">
+      <Link>ServicesContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\ServiceState.cs">
+      <Link>ServiceState.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\ServiceStatistics.cs">
+      <Link>ServiceStatistics.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\ServiceStatisticsPerMachine.cs">
+      <Link>ServiceStatisticsPerMachine.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\ServiceStatisticsSummary.cs">
+      <Link>ServiceStatisticsSummary.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\ServiceType.cs">
+      <Link>ServiceType.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\UploadedItem.cs">
+      <Link>UploadedItem.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\UploadFormDataRequest.cs">
+      <Link>UploadFormDataRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\UploadParameters.cs">
+      <Link>UploadParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\UploadResult.cs">
+      <Link>UploadResult.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\UserToken.cs">
+      <Link>UserToken.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\WebRequestExtensions.cs">
+      <Link>WebRequestExtensions.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
