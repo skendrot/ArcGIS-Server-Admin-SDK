@@ -8,8 +8,8 @@
     <ProjectGuid>{2E61CDF6-B1D7-4C45-9530-AE09919FE500}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VisuallyLocated.AgsAdmin35</RootNamespace>
-    <AssemblyName>VisuallyLocated.AgsAdmin35</AssemblyName>
+    <RootNamespace>VisuallyLocated.ArcGIS.Server</RootNamespace>
+    <AssemblyName>VisuallyLocated.ArcGIS.Server</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -29,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\VisuallyLocated.ArcGIS.Server.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
