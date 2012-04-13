@@ -77,9 +77,9 @@ namespace VisuallyLocated.ArcGIS.Server
             parameters.Add(Constants.Client, Constants.RequestIP);
 
             var taskCompletionSource = new TaskCompletionSource<UserToken>();
-            RequestResult(parameters, Constants.TokenUrl,
+            RequestResult(null, Constants.TokenUrl,
                 result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<UserToken>(result)),
-                true);
+                parameters);
             return taskCompletionSource.Task;
         }
 
@@ -168,9 +168,9 @@ namespace VisuallyLocated.ArcGIS.Server
             parameters.Add(Constants.Description, "None");
 
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
-            RequestResult(parameters, Constants.CreateFolderUrl,
-                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<RequestStatus>(result)),
-                true);
+            RequestResult(null, Constants.CreateFolderUrl,
+                result => taskCompletionSource.SetResult(RequestStatus.Success),
+                parameters);
             return taskCompletionSource.Task;
         }
 
@@ -190,12 +190,14 @@ namespace VisuallyLocated.ArcGIS.Server
             if (service == null) throw new ArgumentNullException("service");
 
             var parameters = GetBaseParameters(token);
+            parameters[Constants.Service] = JsonConvert.SerializeObject(service);
+
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
 
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), service.Name, service.Type);
-            RequestResult(parameters, string.Format("{0}{1}", url, Constants.EditUrl), 
-                result => taskCompletionSource.SetResult(RequestStatus.Success), true,
-                "service=" + JsonConvert.SerializeObject(service));
+            RequestResult(null, string.Format("{0}{1}", url, Constants.EditUrl), 
+                result => taskCompletionSource.SetResult(RequestStatus.Success),
+                parameters);
             return taskCompletionSource.Task;
         }
 
@@ -255,9 +257,9 @@ namespace VisuallyLocated.ArcGIS.Server
             parameters[Constants.ID] = id;
 
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
-            RequestResult(parameters, Constants.RegisterUrl,
+            RequestResult(null, Constants.RegisterUrl,
                 result => taskCompletionSource.SetResult(RequestStatus.Success),
-                true);
+                parameters);
             return taskCompletionSource.Task;
         }
 
@@ -365,13 +367,14 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
-        private void RequestResult(IDictionary<string, string> parameters, string adminEndpoint, Action<string> callback, bool post = false, string postData = null)
+        private void RequestResult(IDictionary<string, string> parameters, string adminEndpoint, Action<string> callback, IDictionary<string, string> postData = null)
         {
             var uri = new Uri(string.Format("{0}{1}?{2}", _serverUrl, adminEndpoint, GetQueryString(parameters)), UriKind.Absolute);
 
+            bool isPost = postData != null;
             WebRequest webRequest = WebRequest.Create(uri);
             webRequest.ContentType = "application/x-www-form-urlencoded";
-            webRequest.Method = post ? "POST" : "GET";
+            webRequest.Method = isPost ? "POST" : "GET";
             //webRequest.Accept = "text/plain";
 
             Action<IAsyncResult> getResponse = asyncResult =>
@@ -389,7 +392,7 @@ namespace VisuallyLocated.ArcGIS.Server
                                                         if (postData != null)
                                                         {
                                                             var encoding = new UTF8Encoding();
-                                                            var bytes = encoding.GetBytes(postData);
+                                                            var bytes = encoding.GetBytes(GetQueryString(postData));
                                                             using (Stream os = webRequest.EndGetRequestStream(asyncResult))
                                                             {
                                                                 os.Write(bytes, 0, bytes.Length);
@@ -398,7 +401,7 @@ namespace VisuallyLocated.ArcGIS.Server
                                                         webRequest.BeginGetResponse(ar2 => getResponse(ar2), null);
                                                     };
 
-            if (post)
+            if (isPost)
             {
                 webRequest.BeginGetRequestStream(ar => postResponse(ar), null);
             }
@@ -432,6 +435,8 @@ namespace VisuallyLocated.ArcGIS.Server
 
         private static string GetQueryString(IDictionary<string, string> parameters)
         {
+            if (parameters == null) return null;
+
             return string.Join("&", parameters.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
         }
     }
