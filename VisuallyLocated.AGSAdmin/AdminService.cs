@@ -410,14 +410,8 @@ namespace VisuallyLocated.ArcGIS.Server
                                        }
                                        catch (Exception e)
                                        {
-                                           //var json = JObject.Parse(responseString);
-                                           //var jsonToken = json["status"];
-                                           //if ((jsonToken != null) && (jsonToken.ToString() == "error"))
-                                           //{
-                                           //    var exception = JsonConvert.DeserializeObject<ServiceException>(responseString);
-                                               result.Exception = e;
-                                               result.Status = RequestStatus.Error;
-                                           //}
+                                           result.Exception = e;
+                                           result.Status = RequestStatus.Error;
                                        }
                                    };
 
