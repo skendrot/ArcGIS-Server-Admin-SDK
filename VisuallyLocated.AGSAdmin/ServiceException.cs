@@ -21,10 +21,71 @@
 */
 
 using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace VisuallyLocated.ArcGIS.Server
 {
+    /// <summary>
+    /// An exception that occured during the request.
+    /// </summary>
     public class ServiceException : Exception
     {
+        /*
+           {
+           "status":"error",
+           "messages":
+                [
+                "service failed to start"
+                ],
+            "detail":
+            {
+                "service":"Electric.ElectricDistribution.MapServer",
+                "state":"FAILED",
+                "message":"",
+                "machines":
+               [
+                   {
+                       "machine":"PC-620083.ABG.CORP",
+                       "state":"FAILED",
+                       "reports":
+                       [
+                           {
+                               "state":"FAILED",
+         *                     "message":"ClassFactory cannot supply requested class"
+         *                 }
+         *             ]
+         *         }
+         *     ]
+         *  }
+         *}
+        */
+
+        public IEnumerable<string> Messages { get; set; }
+
+        public object Detail { get; set; }
+
+        internal static ServiceException Parse(JObject json)
+        {
+            ServiceException exception = null;
+            var jsonToken = json["status"];
+            if ((jsonToken != null) && (jsonToken.ToString() == "error"))
+            {
+                exception = new ServiceException();
+                jsonToken = json["messages"];
+                if (jsonToken != null)
+                {
+                    exception.Messages = jsonToken.ToObject<IEnumerable<string>>();
+                }
+
+                jsonToken = json["detail"];
+                if(jsonToken != null)
+                {
+                    exception.Detail = jsonToken.ToObject<object>();
+                }
+            }
+            return exception;
+        }
     }
 }

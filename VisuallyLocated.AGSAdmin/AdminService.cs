@@ -30,6 +30,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace VisuallyLocated.ArcGIS.Server
 {
@@ -77,9 +78,7 @@ namespace VisuallyLocated.ArcGIS.Server
             parameters.Add(Constants.Client, Constants.RequestIP);
 
             var taskCompletionSource = new TaskCompletionSource<UserToken>();
-            RequestResult(null, Constants.TokenUrl,
-                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<UserToken>(result)),
-                parameters);
+            RequestResult<UserToken>(null, Constants.TokenUrl, taskCompletionSource.SetAdminResult, parameters);
             return taskCompletionSource.Task;
         }
 
@@ -96,8 +95,7 @@ namespace VisuallyLocated.ArcGIS.Server
             var parameters = GetBaseParameters(token);
 
             var taskCompletionSource = new TaskCompletionSource<IEnumerable<Machine>>();
-            RequestResult(parameters, Constants.MachinesUrl,
-                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<IEnumerable<Machine>>(result)));
+            RequestResult<IEnumerable<Machine>>(parameters, Constants.MachinesUrl, taskCompletionSource.SetAdminResult);
             return taskCompletionSource.Task;
         }
 
@@ -122,8 +120,7 @@ namespace VisuallyLocated.ArcGIS.Server
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), serviceName, serviceType);
 
             var taskCompletionSource = new TaskCompletionSource<Service>();
-            RequestResult(parameters, url,
-                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<Service>(result)));
+            RequestResult<Service>(parameters, url, taskCompletionSource.SetAdminResult);
             return taskCompletionSource.Task;
         }
 
@@ -145,8 +142,8 @@ namespace VisuallyLocated.ArcGIS.Server
             parameters.Add(Constants.Detail, getFulldetails.ToString(CultureInfo.InvariantCulture));
 
             var taskCompletionSource = new TaskCompletionSource<ServicesContainer>();
-            RequestResult(parameters, GetFolderUrl(Constants.ServicesUrl, folder),
-                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<ServicesContainer>(result)));
+            RequestResult<ServicesContainer>(parameters, GetFolderUrl(Constants.ServicesUrl, folder),
+                                             taskCompletionSource.SetAdminResult);
             return taskCompletionSource.Task;
         }
 
@@ -168,9 +165,8 @@ namespace VisuallyLocated.ArcGIS.Server
             parameters.Add(Constants.Description, "None");
 
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
-            RequestResult(null, Constants.CreateFolderUrl,
-                result => taskCompletionSource.SetResult(RequestStatus.Success),
-                parameters);
+            RequestResult<RequestStatus>(null, Constants.CreateFolderUrl, taskCompletionSource.SetAdminResult,
+                                         parameters);
             return taskCompletionSource.Task;
         }
 
@@ -195,9 +191,8 @@ namespace VisuallyLocated.ArcGIS.Server
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
 
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), service.Name, service.Type);
-            RequestResult(null, string.Format("{0}{1}", url, Constants.EditUrl), 
-                result => taskCompletionSource.SetResult(RequestStatus.Success),
-                parameters);
+            RequestResult<RequestStatus>(null, string.Format("{0}{1}", url, Constants.EditUrl),
+                                         taskCompletionSource.SetAdminResult, parameters);
             return taskCompletionSource.Task;
         }
 
@@ -214,9 +209,9 @@ namespace VisuallyLocated.ArcGIS.Server
             var parameters = GetBaseParameters(token);
             var taskCompletionSource = new TaskCompletionSource<IEnumerable<UploadedItem>>();
 
-            RequestResult(parameters, Constants.UploadsUrl,
-                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<IEnumerable<UploadedItem>>(result)));
-            return taskCompletionSource.Task;          
+            RequestResult<IEnumerable<UploadedItem>>(parameters, Constants.UploadsUrl,
+                                                     taskCompletionSource.SetAdminResult);
+            return taskCompletionSource.Task;
         }
 
         /// <summary>
@@ -257,9 +252,7 @@ namespace VisuallyLocated.ArcGIS.Server
             parameters[Constants.ID] = id;
 
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
-            RequestResult(null, Constants.RegisterUrl,
-                result => taskCompletionSource.SetResult(RequestStatus.Success),
-                parameters);
+            RequestResult<RequestStatus>(null, Constants.RegisterUrl, taskCompletionSource.SetAdminResult, parameters);
             return taskCompletionSource.Task;
         }
 
@@ -362,12 +355,12 @@ namespace VisuallyLocated.ArcGIS.Server
             string url = GetServiceTypeUrl(GetFolderUrl(Constants.ServicesUrl, folder), serviceName, serviceType);
 
             var taskCompletionSource = new TaskCompletionSource<RequestStatus>();
-            RequestResult(parameters, string.Format("{0}/{1}/", url, action),
-                result => taskCompletionSource.SetResult(JsonConvert.DeserializeObject<RequestStatus>(result)));
+            RequestResult<RequestStatus>(null, string.Format("{0}/{1}/", url, action),
+                                         taskCompletionSource.SetAdminResult, parameters);
             return taskCompletionSource.Task;
         }
 
-        private void RequestResult(IDictionary<string, string> parameters, string adminEndpoint, Action<string> callback, IDictionary<string, string> postData = null)
+        private void RequestResult<T>(IDictionary<string, string> parameters, string adminEndpoint, Action<AdminResult<T>> callback, IDictionary<string, string> postData = null)
         {
             var uri = new Uri(string.Format("{0}{1}?{2}", _serverUrl, adminEndpoint, GetQueryString(parameters)), UriKind.Absolute);
 
@@ -379,26 +372,79 @@ namespace VisuallyLocated.ArcGIS.Server
 
             Action<IAsyncResult> getResponse = asyncResult =>
                                    {
-                                       using (var response = webRequest.EndGetResponse(asyncResult))
-                                       using (var reader = new StreamReader(response.GetResponseStream()))
+                                       var result = new AdminResult<T>();
+                                       try
                                        {
-                                           string result = reader.ReadToEnd();
-                                           if (callback != null) callback(result);
+                                           using (var response = webRequest.EndGetResponse(asyncResult))
+                                           {
+                                               try
+                                               {
+                                                   using (var reader = new StreamReader(response.GetResponseStream()))
+                                                   {
+                                                       string responseString = reader.ReadToEnd();
+                                                       var json = JObject.Parse(responseString);
+                                                       var jsonToken = json["status"];
+                                                       if (jsonToken != null)
+                                                       {
+                                                           // If a request has a status property, only worry about
+                                                           // the requests that come back with {"status": "error", otherstuff }
+                                                           if (jsonToken.ToString() == "error")
+                                                           {
+                                                               var exception = ServiceException.Parse(json);
+                                                               result.Exception = exception;
+                                                           }
+                                                       }
+                                                       else
+                                                       {
+                                                           result.Result = JsonConvert.DeserializeObject<T>(responseString);
+                                                       }
+                                                       if (callback != null) callback(result);
+                                                   }
+                                               }
+                                               catch (Exception e)
+                                               {
+                                                   result.Exception = e;
+                                                   result.Status = RequestStatus.Error;
+                                               }
+                                           }
+                                       }
+                                       catch (Exception e)
+                                       {
+                                           //var json = JObject.Parse(responseString);
+                                           //var jsonToken = json["status"];
+                                           //if ((jsonToken != null) && (jsonToken.ToString() == "error"))
+                                           //{
+                                           //    var exception = JsonConvert.DeserializeObject<ServiceException>(responseString);
+                                               result.Exception = e;
+                                               result.Status = RequestStatus.Error;
+                                           //}
                                        }
                                    };
 
             Action<IAsyncResult> postResponse = asyncResult =>
                                                     {
-                                                        if (postData != null)
+                                                        try
                                                         {
-                                                            var encoding = new UTF8Encoding();
-                                                            var bytes = encoding.GetBytes(GetQueryString(postData));
-                                                            using (Stream os = webRequest.EndGetRequestStream(asyncResult))
+                                                            if (postData != null)
                                                             {
-                                                                os.Write(bytes, 0, bytes.Length);
+                                                                var encoding = new UTF8Encoding();
+                                                                var bytes = encoding.GetBytes(GetQueryString(postData));
+                                                                using (
+                                                                    Stream os =
+                                                                        webRequest.EndGetRequestStream(asyncResult))
+                                                                {
+                                                                    os.Write(bytes, 0, bytes.Length);
+                                                                }
                                                             }
+                                                            webRequest.BeginGetResponse(ar2 => getResponse(ar2), null);
                                                         }
-                                                        webRequest.BeginGetResponse(ar2 => getResponse(ar2), null);
+                                                        catch (Exception e)
+                                                        {
+                                                            AdminResult<T> result = new AdminResult<T>();
+                                                            result.Exception = e;
+                                                            result.Status = RequestStatus.Error;
+                                                            if (callback != null) callback(result);
+                                                        }
                                                     };
 
             if (isPost)

@@ -22,8 +22,19 @@
 
 namespace VisuallyLocated.ArcGIS.Server
 {
+    /// <summary>
+    /// Represents the status of the request.
+    /// </summary>
     public enum RequestStatus
     {
-        Success
+        /// <summary>
+        /// Represents a successful request.
+        /// </summary>
+        Success,
+
+        /// <summary>
+        /// Represents a request with an error.
+        /// </summary>
+        Error
     }
 }

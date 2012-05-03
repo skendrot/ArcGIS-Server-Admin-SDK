@@ -42,8 +42,10 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdminResult.cs" />
     <Compile Include="AdminService.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="IsolationLevel.cs" />
     <Compile Include="LoadBalancing.cs" />
     <Compile Include="LogLevel.cs" />

@@ -62,6 +62,9 @@
     <Compile Include="..\VisuallyLocated.AGSAdmin\EditServiceParameters.cs">
       <Link>EditServiceParameters.cs</Link>
     </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
     <Compile Include="..\VisuallyLocated.AGSAdmin\IsolationLevel.cs">
       <Link>IsolationLevel.cs</Link>
     </Compile>
@@ -79,6 +82,9 @@
     </Compile>
     <Compile Include="..\VisuallyLocated.AGSAdmin\Service.cs">
       <Link>Service.cs</Link>
+    </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\ServiceException.cs">
+      <Link>ServiceException.cs</Link>
     </Compile>
     <Compile Include="..\VisuallyLocated.AGSAdmin\ServiceExtension.cs">
       <Link>ServiceExtension.cs</Link>
