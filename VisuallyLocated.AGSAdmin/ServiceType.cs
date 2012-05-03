@@ -25,12 +25,74 @@ using Newtonsoft.Json.Converters;
 
 namespace VisuallyLocated.ArcGIS.Server
 {
+    /// <summary>
+    /// Represents the type of service
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ServiceType
     {
+        /// <summary>
+        /// A service for performing map operations. 
+        /// This is the standard service. 
+        /// </summary>
+        /// <remarks>
+        /// Capabilities: Map, Query, Data
+        /// </remarks>
         MapServer,
+
+        /// <summary>
+        /// A service for performing editing operations.
+        /// </summary>
+        /// <remarks>
+        /// Capabilities: Map, Query, Data
+        /// </remarks>     
         FeatureService,
+
+        /// <summary>
+        /// A service for performing geometry operations.
+        /// </summary>
         GeometryServer,
-        SearchServer
+
+        /// <summary>
+        /// A service for performing search operations.
+        /// </summary>
+        SearchServer,
+
+        /// <summary>
+        /// A service for displaying images.
+        /// </summary>
+        /// <remarks>
+        /// Capabilities: Image, Metadata
+        /// </remarks>
+        ImageServer,
+
+        /// <summary>
+        /// A service for performing geocoding operations.
+        /// </summary>
+        /// <remarks>
+        /// Capabilities: Geocode, ReverseGeocode
+        /// </remarks>
+        GeocodeServer,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Capabilities: Query, Extraction
+        /// </remarks>
+        GeoDataServer,
+
+        /// <summary>
+        /// A service for performing geoprocessing operations.
+        /// </summary>
+        GPServer,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Capabilities: globe, animation, query
+        /// </remarks>
+        GlobeServer
     }
 }
