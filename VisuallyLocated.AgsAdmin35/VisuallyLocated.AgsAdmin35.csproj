@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\VisuallyLocated.ArcGIS.Server.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\VisuallyLocated.Key.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.1\lib\net35\Newtonsoft.Json.dll</HintPath>
@@ -55,9 +61,6 @@
     </Compile>
     <Compile Include="..\VisuallyLocated.AGSAdmin\Constants.cs">
       <Link>Constants.cs</Link>
-    </Compile>
-    <Compile Include="..\VisuallyLocated.AGSAdmin\CreateServiceParameters.cs">
-      <Link>CreateServiceParameters.cs</Link>
     </Compile>
     <Compile Include="..\VisuallyLocated.AGSAdmin\EditServiceParameters.cs">
       <Link>EditServiceParameters.cs</Link>
@@ -128,6 +131,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\VisuallyLocated.Key.pfx">
+      <Link>VisuallyLocated.Key.pfx</Link>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
