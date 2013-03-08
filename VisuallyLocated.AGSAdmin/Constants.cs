@@ -1,5 +1,6 @@
 ﻿/*
     Copyright (c) 2012 Shawn Kendrot
+    
     This license governs use of the accompanying software. If you use the software, you
     accept this license. If you do not accept the license, do not use the software.
 
@@ -26,6 +27,7 @@ namespace VisuallyLocated.ArcGIS.Server
     {
         private const string AdminUrl = "/arcgis/admin/";
 
+        public const string PublicKeyUrl = AdminUrl + "publicKey";
         public const string TokenUrl = AdminUrl + "generateToken";
         public const string ServicesUrl = AdminUrl + "services/";
         public const string QueryUrl = AdminUrl + "logs/query";
@@ -53,6 +55,7 @@ namespace VisuallyLocated.ArcGIS.Server
         public const string Stop = "stop";
         public const string ID = "id";
         public const string RequestIP = "requestip";
-
+        public const string Encrypted = "encrypted";
+        public const string True = "true";
     }
 }
