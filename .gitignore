@@ -1,0 +1,6 @@
+[Bb]in/
+[Oo]bj/
+[Ww]orking/
+_ReSharper*
+*.suo
+*.user
