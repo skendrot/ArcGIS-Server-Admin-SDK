@@ -82,6 +82,7 @@ namespace VisuallyLocated.ArcGIS.Server
             return taskCompletionSource.Task;
         }
 
+
         /// <summary>
         /// Retrieves the machines associated with the ArcGIS Server.
         /// </summary>
