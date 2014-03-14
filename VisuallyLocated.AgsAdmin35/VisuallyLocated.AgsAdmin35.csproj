@@ -116,6 +116,9 @@
     <Compile Include="..\VisuallyLocated.AGSAdmin\UploadedItem.cs">
       <Link>UploadedItem.cs</Link>
     </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\UploadedItems.cs">
+      <Link>UploadedItems.cs</Link>
+    </Compile>
     <Compile Include="..\VisuallyLocated.AGSAdmin\UploadFormDataRequest.cs">
       <Link>UploadFormDataRequest.cs</Link>
     </Compile>

@@ -269,14 +269,14 @@ namespace VisuallyLocated.ArcGIS.Server
         /// <param name="token">The <see cref="UserToken"/> for the ArcGIS Server Manager user.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">token cannot be null.</exception>
-        public Task<IEnumerable<UploadedItem>> GetUploadedItems(UserToken token)
+        public Task<UploadedItems> GetUploadedItems(UserToken token)
         {
             if (token == null) throw new ArgumentNullException("token");
 
             var parameters = GetBaseParameters(token);
-            var taskCompletionSource = new TaskCompletionSource<IEnumerable<UploadedItem>>();
+            var taskCompletionSource = new TaskCompletionSource<UploadedItems>();
 
-            RequestResult<IEnumerable<UploadedItem>>(parameters, Constants.UploadsUrl,
+            RequestResult<UploadedItems>(parameters, Constants.UploadsUrl,
                                                      taskCompletionSource.SetAdminResult);
             return taskCompletionSource.Task;
         }
