@@ -60,6 +60,64 @@ namespace VisuallyLocated.ArcGIS.Server
         }
 
         /// <summary>
+        /// Decode a hex encoded string to a byte array.
+        /// </summary>
+        /// <param name="hex">The hex encoded string.</param>
+        /// <returns>The resulting byte array.</returns>
+        private static byte[] HexToBytes(string hex)
+        {
+            int length = hex.Length;
+
+            if (length % 2 != 0)
+            {
+                length += 1;
+                hex = "0" + hex;
+            }
+
+            byte[] bytes = new byte[length / 2];
+            for (int i = 0; i < length; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+
+            return bytes;
+        }
+
+        /// <summary>
+        /// Encodes a byte array as a string of hex values.
+        /// </summary>
+        /// <param name="bytes">The input byte array to encode.</param>
+        /// <returns>The hex encoded bytes as a string.</returns>
+        private static string BytesToHex(byte[] bytes)
+        {
+            StringBuilder stringBuilder = new StringBuilder(bytes.Length * 2);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                byte b = bytes[i];
+                stringBuilder.AppendFormat("{0:x2}", b);
+            }
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Encrypt a given plain text using the <see cref="PublicKey" data from the server./>
+        /// </summary>
+        /// <param name="key">The ArcGIS Server public key information to use.</param>
+        /// <param name="plainText">The plain text to encrypt.</param>
+        /// <returns>The hex encoded encrypted data.</returns>
+        private static string EncryptData(PublicKey key, string plainText)
+        {
+            byte[] exponent = HexToBytes(key.Exponent);
+            byte[] modulus = HexToBytes(key.Modulus);
+
+            using (var rsa = new System.Security.Cryptography.RSACryptoServiceProvider(512))
+            {
+                var rsaParms = new System.Security.Cryptography.RSAParameters() { Exponent = exponent, Modulus = modulus };
+                rsa.ImportParameters(rsaParms);
+
+                return BytesToHex(rsa.Encrypt(Encoding.UTF8.GetBytes(plainText), false));
+            }
+        }
+
+        /// <summary>
         /// Generates a new <see cref="UserToken"/>
         /// </summary>
         /// <param name="user">The ArcGIS Server Manager user name to use.</param>
@@ -72,16 +130,24 @@ namespace VisuallyLocated.ArcGIS.Server
             if (user == null) throw new ArgumentNullException("user");
             if (password == null) throw new ArgumentNullException("password");
 
+            // get public key information in order to encrypt password information in case the server is not secured with SSL
             var parameters = GetBaseParameters();
-            parameters.Add(Constants.UserName, user);
-            parameters.Add(Constants.Password, password);
-            parameters.Add(Constants.Client, Constants.RequestIP);
+            var publicKeyCompletionSource = new TaskCompletionSource<PublicKey>();
+            RequestResult<PublicKey>(null, Constants.PublicKeyUrl, publicKeyCompletionSource.SetAdminResult, parameters);
+            publicKeyCompletionSource.Task.Wait();
+            PublicKey publicKey = publicKeyCompletionSource.Task.Result;
+
+            // setup token query
+            parameters = GetBaseParameters();
+            parameters.Add(Constants.UserName, EncryptData(publicKey, user));
+            parameters.Add(Constants.Password, EncryptData(publicKey, password));
+            parameters.Add(Constants.Client, EncryptData(publicKey, Constants.RequestIP));
+            parameters.Add(Constants.Encrypted, Constants.True);
 
             var taskCompletionSource = new TaskCompletionSource<UserToken>();
             RequestResult<UserToken>(null, Constants.TokenUrl, taskCompletionSource.SetAdminResult, parameters);
             return taskCompletionSource.Task;
         }
-
 
         /// <summary>
         /// Retrieves the machines associated with the ArcGIS Server.

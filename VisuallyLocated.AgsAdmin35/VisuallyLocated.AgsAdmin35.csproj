@@ -80,6 +80,9 @@
     <Compile Include="..\VisuallyLocated.AGSAdmin\Machine.cs">
       <Link>Machine.cs</Link>
     </Compile>
+    <Compile Include="..\VisuallyLocated.AGSAdmin\PublicKey.cs">
+      <Link>PublicKey.cs</Link>
+    </Compile>
     <Compile Include="..\VisuallyLocated.AGSAdmin\RequestStatus.cs">
       <Link>RequestStatus.cs</Link>
     </Compile>
